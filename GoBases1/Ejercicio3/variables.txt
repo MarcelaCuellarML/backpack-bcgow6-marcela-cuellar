@@ -1,5 +1,3 @@
-package main
-
 var primerNombre string       //No puede empezar por un numero, debe empezar con una letra, se puede reemplazar por primerNombre
 var apellido string           //Esta correcta, se puede definir como una variable no exportada
 var edad int                  //Se debe definir primero el nombre de la variable y luego su tipo, no al contrario
