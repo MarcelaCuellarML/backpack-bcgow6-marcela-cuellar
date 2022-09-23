@@ -1,0 +1,9 @@
+package main
+
+var primerNombre string       //No puede empezar por un numero, debe empezar con una letra, se puede reemplazar por primerNombre
+var apellido string           //Esta correcta, se puede definir como una variable no exportada
+var edad int                  //Se debe definir primero el nombre de la variable y luego su tipo, no al contrario
+var primerApellido = 6        //No puede empezar por un numero, debe empezar con una letra, se puede reemplazar por primerApellido adicional para usar el atajo de creacion de la variable se debe colocar dentro de una funcion
+var licenciaDeConducir = true //Se debe emplear camelCase para el nombramiento de variables con mas de una palabra
+var estaturaDeLaPersona int   //Se debe emplear camelCase para el nombramiento de variables con mas de una palabra
+var cantidadDeHijos = 2       //Esta correcta aunque para usar el atajo de creacion de la variable se debe colocar dentro de una funcion
