@@ -34,3 +34,10 @@ Se debe generar la estructura request
 Se debe generar la estructura del controlador que tenga como campo el servicio
 Se debe generar la función que retorne el controlador
 Se deben generar todos los métodos correspondientes a los endpoints
+
+
+
+
+
+
+
