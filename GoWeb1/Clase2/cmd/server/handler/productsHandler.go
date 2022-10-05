@@ -1,13 +1,15 @@
 package handler
 
 import (
+	"fmt"
 	"net/http"
 
-	"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/products"
+	"backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/products"
+
 	"github.com/gin-gonic/gin"
 )
 
-type Products struct {
+type request struct {
 	Id           int     `json:"id"`
 	Name         string  `json:"name" binding:"required"`
 	Color        string  `json:"color" binding:"required"`
@@ -18,43 +20,74 @@ type Products struct {
 	CreationDate string  `json:"creationDate" binding:"required"`
 }
 
-type ProductService struct {
-	service products.Service
+type Products struct {
+	service products.ProductsService
 }
 
-func NewProduct(p products.Service) *Products {
+func NewProduct(p products.ProductsService) *Products {
 	return &Products{
 		service: p,
 	}
 }
 
-func AgregarProducto(ctx *gin.Context) {
-	token := ctx.GetHeader("token")
-	if token != "12345" || token == "" {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
-		return
-	} else {
-		var prod Products
-		if err := ctx.ShouldBindJSON(&prod); err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
-		}
-		ctx.JSON(http.StatusOK, prod)
-	}
+func (prod *Products) CreateProduct() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		token := ctx.Request.Header.Get("token")
+		if token != "12345" || token == "" {
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
+			return
+		} else {
+			var productAdd request
+			if err := ctx.ShouldBindJSON(&productAdd); err != nil {
+				fmt.Println("Error al recibir json")
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			}
 
+			productoCrear := products.Products{
+				Name:  productAdd.Name,
+				Color: productAdd.Color,
+				Price: productAdd.Price,
+				Stock: productAdd.Stock,
+				Code:  productAdd.Code,
+			}
+			p, err := prod.service.AgregarProducto(productAdd.Name, productAdd.Color, productAdd.Price, productAdd.Stock, productAdd.Code)
+			fmt.Println("valor de p: ", p)
+			if err != nil {
+				ctx.JSON(http.StatusNotFound, gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
+			ctx.JSON(http.StatusOK, p)
+
+			// if err := ctx.ShouldBindJSON(&productAdd); err != nil {
+			// 	prod.service.AgregarProducto(products.Products(productAdd))
+			// 	fmt.Println("producto creado: ", products.Products(productAdd))
+			// 	ctx.JSON(http.StatusOK, products.Products(productAdd))
+			// } else {
+			// 	ctx.JSON(http.StatusBadRequest, "error de guardado y llamado a guardar")
+			// }
+
+		}
+
+	}
 }
 
-func GetAll(ctx *gin.Context) {
-	if token != "12345" || token == "" {
-		ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
-		return
-	} else {
-		p, err := c.service.GetAll()
-		if err != nil {
-			ctx.JSON(http.StatusBadRequest, gin.H{
-				"error": err.Error(),
-			})
+func (prod *Products) GetAll() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		token := ctx.Request.Header.Get("token")
+		if token != "12345" || token == "" {
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
 			return
+		} else {
+			p, err := prod.service.GetAll()
+			if err != nil {
+				ctx.JSON(http.StatusNotFound, gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
+			ctx.JSON(200, p)
 		}
-		ctx.JSON(200, p)
 	}
 }

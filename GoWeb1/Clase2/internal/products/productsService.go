@@ -1,5 +1,7 @@
 package products
 
+import "fmt"
+
 type ProductsService interface {
 	GetAll() ([]Products, error)
 	//GetProductByID() (Products, error)
@@ -35,8 +37,10 @@ func (s *serviceProducts) GetAll() ([]Products, error) {
 // }
 
 // Funcion para agregar un producto al slice
-func (s *serviceProducts) AgregarProducto(product Products) (string, error) {
+func (s *serviceProducts) AgregarProducto(Id, Stock int, Name, Color, Code, CreationDate string, Price float64, Published bool) (string, error) {
 	ps, err := s.repo.AgregarProducto(product)
+	fmt.Println("llegue al servicio")
+	fmt.Println("Producto que llega al servicio: ", product.Name)
 	if err != nil {
 		return "nil", err
 	}

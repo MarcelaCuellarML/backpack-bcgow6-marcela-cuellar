@@ -2,6 +2,7 @@ package products
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 )
 
@@ -30,7 +31,7 @@ type ProductsRepository interface {
 
 // ***********FUNCIONES DE INTERACCION CON EL ARCHIVO*******************
 func leerJson() []byte {
-	readFile, err := os.ReadFile("products.json")
+	readFile, err := os.ReadFile("/Users/marcuellar/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/products/productos.json")
 	if err != nil {
 		panic(err)
 	}
@@ -82,8 +83,10 @@ func (rp *repositoryProducts) GetProductByID(id int) (Products, error) {
 
 // Funcion para agregar un producto al slice
 func (rp *repositoryProducts) AgregarProducto(product Products) (string, error) {
+	fmt.Println("llegue al repositorio")
 	listadoProds := GetList()
 	listadoProds = append(listadoProds, product)
+	fmt.Println("listado productos: ", listadoProds)
 	resp := "200"
 	return resp, nil
 }

@@ -1,22 +1,22 @@
 package main
 
 import (
-	"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/cmd/server/handler"
-	"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/products"
+	"backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/cmd/server/handler"
+	"backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/products"
+
 	"github.com/gin-gonic/gin"
 )
 
 func main() {
 	repo := products.NewRepository()
 	service := products.NewService(repo)
+	handler := handler.NewProduct(service)
 
-	p := handler.NewProduct(service)
+	router := gin.Default()
 
-	r := gin.Default()
+	pr := router.Group("/products")
+	pr.POST("/AddProduct", handler.CreateProduct())
+	pr.GET("/", handler.GetAll())
 
-	pr := r.Group("/products")
-	pr.POST("/", p.Store())
-	pr.GET("/", p.GetAll())
-	pr.PUT("/:id", p.Update())
-	r.Run()
+	router.Run()
 }
