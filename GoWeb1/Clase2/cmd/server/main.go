@@ -1,10 +1,10 @@
 package main
 
 import (
-	"backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/cmd/server/handler"
-	"backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/products"
-
 	"github.com/gin-gonic/gin"
+
+	"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/cmd/server/handler"
+	"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/products"
 )
 
 func main() {

@@ -1,72 +1,49 @@
 package products
 
 import (
-	"encoding/json"
 	"fmt"
-	"os"
+
+	"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/pkg/store"
+	//"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/domain"
 )
 
-type Products struct {
-	Id           int
-	Name         string
-	Color        string
-	Price        float64
-	Stock        int
-	Code         string
-	Published    bool
-	CreationDate string
+var products []domains.Products
+
+type repositoryProducts struct {
+	db store.Store
 }
 
-type repositoryProducts struct{}
-
-func NewRepository() ProductsRepository {
-	return &repositoryProducts{}
+func NewRepository(db store.Store) ProductsRepository {
+	return &repositoryProducts{
+		db: db,
+	}
 }
 
 type ProductsRepository interface {
-	GetAll() ([]Products, error)
-	GetProductByID(id int) (Products, error)
-	AgregarProducto(product Products) (string, error)
+	GetAll() ([]products, error)
+	GetProductByID(id int) (products, error)
+	AgregarProducto(product products) (string, error)
+	NewID() (NewId int)
+	ActualizarProducto(id int, product products) (string, error)
 }
-
-// ***********FUNCIONES DE INTERACCION CON EL ARCHIVO*******************
-func leerJson() []byte {
-	readFile, err := os.ReadFile("/Users/marcuellar/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/products/productos.json")
-	if err != nil {
-		panic(err)
-	}
-	//listado := fmt.Sprint(string(readFile))
-	return readFile
-}
-
-func TransformData(listado []byte) (product []Products) {
-	err := json.Unmarshal(listado, &product)
-	if err != nil {
-		panic(err)
-	}
-	//fmt.Println("archivo prueba: ", product)
-	return product
-}
-
-func GetList() (prod []Products) {
-	respuesta := leerJson()
-	listadoProds := TransformData(respuesta)
-	return listadoProds
-}
-
-//*********************FIN****************************
 
 // Funcion para obtener el slice de elementos
-func (rp *repositoryProducts) GetAll() ([]Products, error) {
-	listadoProds := GetList()
-	return listadoProds, nil
+func (rp *repositoryProducts) GetAll() ([]products, error) {
+	err := rp.db.Read(&products)
+	if err != nil {
+		return nil, err
+	}
+	return products, nil
 }
 
 // Funcion para obtener un elemento por su ID
-func (rp *repositoryProducts) GetProductByID(id int) (Products, error) {
-	listadoProds := GetList()
-	var productosFiltrados Products
-	for _, prod := range listadoProds {
+func (rp *repositoryProducts) GetProductByID(id int) (products, error) {
+	err := rp.db.Read(&products)
+	if err != nil {
+		return nil, err
+	}
+	var productosFiltrados products
+	for _, prod := range products {
 		if prod.Id == id {
 			productosFiltrados.Id = prod.Id
 			productosFiltrados.Name = prod.Name
@@ -82,11 +59,46 @@ func (rp *repositoryProducts) GetProductByID(id int) (Products, error) {
 }
 
 // Funcion para agregar un producto al slice
-func (rp *repositoryProducts) AgregarProducto(product Products) (string, error) {
-	fmt.Println("llegue al repositorio")
-	listadoProds := GetList()
-	listadoProds = append(listadoProds, product)
-	fmt.Println("listado productos: ", listadoProds)
-	resp := "200"
-	return resp, nil
+func (r *repositoryProducts) AgregarProducto(stock int, name, color, code, creationDate string, price float64, published bool) (products, error) {
+
+	var productsList []products
+	err := r.db.Read(&productsList)
+	if err != nil {
+		return products{}, err
+	}
+	newId, _ := GenerateNewID()
+	newProduct := products{newId, name, color, price, stock, code, published, creationDate}
+	fmt.Println("nuevo producto a agregar: ", newProduct)
+	productsList = append(productsList, newProduct)
+	if err := r.db.Write(productsList); err != nil {
+		return products{}, err
+	}
+
+	return newProduct, nil
+}
+
+// Funcion para obtener un nuevo id
+func GenerateNewID() (int, error) {
+	rp := repositoryProducts{}
+	err := rp.db.Read(&products)
+	if err != nil {
+		return 0, err
+	}
+	newId := len(products) + 1
+	fmt.Println("Nuevo id generado en el servicio: ", newId)
+	return newId, nil
+}
+
+func (rp *repositoryProducts) ActualizarProducto(id int, product products) (string, error) {
+	err := rp.db.Read(&products)
+	if err != nil {
+		return "", err
+	}
+	for i := 0; i < len(products); i++ {
+		if products[i].Id == id {
+			products[i] = product
+		}
+	}
+	fmt.Println("producto filtrado: ", product)
+	return product, nil
 }

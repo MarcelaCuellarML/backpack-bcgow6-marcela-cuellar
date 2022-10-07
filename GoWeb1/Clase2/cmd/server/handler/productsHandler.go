@@ -3,10 +3,13 @@ package handler
 import (
 	"fmt"
 	"net/http"
-
-	"backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/products"
+	"os"
+	"strconv"
 
 	"github.com/gin-gonic/gin"
+
+	"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/products"
+	//"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/pkg/web"
 )
 
 type request struct {
@@ -30,12 +33,34 @@ func NewProduct(p products.ProductsService) *Products {
 	}
 }
 
+// /Funcion para validar el token
+func validateToken(ctx *gin.Context) string {
+	token := ctx.Request.Header.Get("token")
+	if token != os.Getenv("TOKEN") || token == "" {
+		return "no autorizado"
+	}
+	return "autorizado"
+}
+
+//*****************************************
+
+// Store Product godoc
+// @Summary  Store product
+// @Tags     Products
+// @Accept   json
+// @Produce  json
+// @Param    token    header    string          true  "token requerido"
+// @Param    product  body      ProductRequest  true  "Product to Store"
+// @Success  200      {object}  web.Response
+// @Failure  401      {object}  web.Response
+// @Failure  400      {object}  web.Response
+// @Failure  409      {object}  web.Response
+// @Router   /products [POST]
 func (prod *Products) CreateProduct() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		token := ctx.Request.Header.Get("token")
-		if token != "12345" || token == "" {
+		validToken := validateToken(ctx)
+		if validToken == "no autorizado" {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
-			return
 		} else {
 			var productAdd request
 			if err := ctx.ShouldBindJSON(&productAdd); err != nil {
@@ -43,14 +68,7 @@ func (prod *Products) CreateProduct() gin.HandlerFunc {
 				ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 			}
 
-			productoCrear := products.Products{
-				Name:  productAdd.Name,
-				Color: productAdd.Color,
-				Price: productAdd.Price,
-				Stock: productAdd.Stock,
-				Code:  productAdd.Code,
-			}
-			p, err := prod.service.AgregarProducto(productAdd.Name, productAdd.Color, productAdd.Price, productAdd.Stock, productAdd.Code)
+			p, err := prod.service.AgregarProducto(productAdd.Stock, productAdd.Name, productAdd.Color, productAdd.Code, productAdd.CreationDate, productAdd.Price, productAdd.Published)
 			fmt.Println("valor de p: ", p)
 			if err != nil {
 				ctx.JSON(http.StatusNotFound, gin.H{
@@ -60,25 +78,26 @@ func (prod *Products) CreateProduct() gin.HandlerFunc {
 			}
 			ctx.JSON(http.StatusOK, p)
 
-			// if err := ctx.ShouldBindJSON(&productAdd); err != nil {
-			// 	prod.service.AgregarProducto(products.Products(productAdd))
-			// 	fmt.Println("producto creado: ", products.Products(productAdd))
-			// 	ctx.JSON(http.StatusOK, products.Products(productAdd))
-			// } else {
-			// 	ctx.JSON(http.StatusBadRequest, "error de guardado y llamado a guardar")
-			// }
-
 		}
 
 	}
 }
 
+// ListProducts godoc
+// @Summary  Show list products
+// @Tags     Products
+// @Produce  json
+// @Param    token  header    string        true  "token"
+// @Success  200    {object}  web.Response  "List products"
+// @Failure  401    {object}  web.Response  "Unauthorized"
+// @Failure  500    {object}  web.Response  "Internal server error "
+// @Failure  404    {object}  web.Response  "Not found products"
+// @Router   /products [GET]
 func (prod *Products) GetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
-		token := ctx.Request.Header.Get("token")
-		if token != "12345" || token == "" {
+		validToken := validateToken(ctx)
+		if validToken == "no autorizado" {
 			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
-			return
 		} else {
 			p, err := prod.service.GetAll()
 			if err != nil {
@@ -89,5 +108,38 @@ func (prod *Products) GetAll() gin.HandlerFunc {
 			}
 			ctx.JSON(200, p)
 		}
+	}
+}
+
+func (prod *Products) UpdateProduct() gin.HandlerFunc {
+	return func(ctx *gin.Context) {
+		validToken := validateToken(ctx)
+		if validToken == "no autorizado" {
+			ctx.JSON(http.StatusUnauthorized, gin.H{"error": "Token inválido"})
+		} else {
+			var productUpdate request
+			if err := ctx.ShouldBindJSON(&productUpdate); err != nil {
+				fmt.Println("Error al recibir json")
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
+			}
+
+			id, err := strconv.Atoi(ctx.Param("id"))
+			if err != nil {
+				ctx.JSON(http.StatusBadRequest, gin.H{"error": "Id invalido - " + err.Error()})
+				return
+			}
+
+			p, err := prod.service.ActualizarProducto(id, productUpdate.Stock, productUpdate.Name, productUpdate.Color, productUpdate.Code, productUpdate.CreationDate, productUpdate.Price, productUpdate.Published)
+			fmt.Println("valor de p: ", p)
+			if err != nil {
+				ctx.JSON(http.StatusNotFound, gin.H{
+					"error": err.Error(),
+				})
+				return
+			}
+			ctx.JSON(http.StatusOK, p)
+
+		}
+
 	}
 }
