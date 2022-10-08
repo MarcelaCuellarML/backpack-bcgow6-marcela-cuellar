@@ -3,10 +3,7 @@ package store
 import (
 	"encoding/json"
 	"os"
-	//"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/domain"
 )
-
-var products []domains.Products
 
 type Store interface {
 	Read(data interface{}) error

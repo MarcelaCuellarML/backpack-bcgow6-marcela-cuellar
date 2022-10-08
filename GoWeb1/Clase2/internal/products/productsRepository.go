@@ -3,11 +3,11 @@ package products
 import (
 	"fmt"
 
+	"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/domain"
 	"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/pkg/store"
-	//"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/domain"
 )
 
-var products []domains.Products
+var products []domain.Products
 
 type repositoryProducts struct {
 	db store.Store
@@ -20,15 +20,17 @@ func NewRepository(db store.Store) ProductsRepository {
 }
 
 type ProductsRepository interface {
-	GetAll() ([]products, error)
-	GetProductByID(id int) (products, error)
-	AgregarProducto(product products) (string, error)
-	NewID() (NewId int)
-	ActualizarProducto(id int, product products) (string, error)
+	GetAll() ([]domain.Products, error)
+	GetProductByID(id int) (domain.Products, error)
+	AgregarProducto(product domain.Products) (domain.Products, error)
+	GenerateNewID() (int, error)
+	ActualizarProducto(id int, newProduct domain.Products) (domain.Products, error)
+	DeleteElement(id int) ([]domain.Products, error)
+	UpdateQuantity(id, cant int) (domain.Products, error)
 }
 
-// Funcion para obtener el slice de elementos
-func (rp *repositoryProducts) GetAll() ([]products, error) {
+// Funcion para obtener el listado de elementos
+func (rp *repositoryProducts) GetAll() ([]domain.Products, error) {
 	err := rp.db.Read(&products)
 	if err != nil {
 		return nil, err
@@ -37,12 +39,12 @@ func (rp *repositoryProducts) GetAll() ([]products, error) {
 }
 
 // Funcion para obtener un elemento por su ID
-func (rp *repositoryProducts) GetProductByID(id int) (products, error) {
+func (rp *repositoryProducts) GetProductByID(id int) (domain.Products, error) {
 	err := rp.db.Read(&products)
 	if err != nil {
-		return nil, err
+		return domain.Products{}, err
 	}
-	var productosFiltrados products
+	var productosFiltrados domain.Products
 	for _, prod := range products {
 		if prod.Id == id {
 			productosFiltrados.Id = prod.Id
@@ -59,27 +61,23 @@ func (rp *repositoryProducts) GetProductByID(id int) (products, error) {
 }
 
 // Funcion para agregar un producto al slice
-func (r *repositoryProducts) AgregarProducto(stock int, name, color, code, creationDate string, price float64, published bool) (products, error) {
+func (r *repositoryProducts) AgregarProducto(product domain.Products) (domain.Products, error) {
 
-	var productsList []products
+	var productsList []domain.Products
 	err := r.db.Read(&productsList)
 	if err != nil {
-		return products{}, err
+		return domain.Products{}, err
 	}
-	newId, _ := GenerateNewID()
-	newProduct := products{newId, name, color, price, stock, code, published, creationDate}
-	fmt.Println("nuevo producto a agregar: ", newProduct)
-	productsList = append(productsList, newProduct)
+	fmt.Println("nuevo producto a agregar: ", product)
+	productsList = append(productsList, product)
 	if err := r.db.Write(productsList); err != nil {
-		return products{}, err
+		return domain.Products{}, err
 	}
-
-	return newProduct, nil
+	return product, nil
 }
 
 // Funcion para obtener un nuevo id
-func GenerateNewID() (int, error) {
-	rp := repositoryProducts{}
+func (rp *repositoryProducts) GenerateNewID() (int, error) {
 	err := rp.db.Read(&products)
 	if err != nil {
 		return 0, err
@@ -89,16 +87,63 @@ func GenerateNewID() (int, error) {
 	return newId, nil
 }
 
-func (rp *repositoryProducts) ActualizarProducto(id int, product products) (string, error) {
+// Funcion para acualizar un producto
+func (rp *repositoryProducts) ActualizarProducto(id int, newProduct domain.Products) (domain.Products, error) {
 	err := rp.db.Read(&products)
+	var product domain.Products
 	if err != nil {
-		return "", err
+		return domain.Products{}, err
 	}
 	for i := 0; i < len(products); i++ {
 		if products[i].Id == id {
-			products[i] = product
+			product = products[i]
 		}
 	}
+	rp.db.Write(&products)
+	err = rp.db.Read(&products)
+	if err != nil {
+		return domain.Products{}, err
+	}
 	fmt.Println("producto filtrado: ", product)
+	return product, nil
+}
+
+// Funcion para eliminar un elemento
+func (rp *repositoryProducts) DeleteElement(id int) ([]domain.Products, error) {
+	err := rp.db.Read(&products)
+	if err != nil {
+		return []domain.Products{}, err
+	}
+	for i := 0; i < len(products); i++ {
+		if products[i].Id == id {
+			products[i] = domain.Products{}
+		}
+	}
+	rp.db.Write(&products)
+	err = rp.db.Read(&products)
+	if err != nil {
+		return []domain.Products{}, err
+	}
+	fmt.Println("producto eliminado")
+	return products, nil
+}
+
+func (rp *repositoryProducts) UpdateQuantity(id, cant int) (domain.Products, error) {
+	err := rp.db.Read(&products)
+	var product domain.Products
+	if err != nil {
+		return domain.Products{}, err
+	}
+	for i := 0; i < len(products); i++ {
+		if products[i].Id == id {
+			products[i].Stock = cant
+		}
+	}
+	rp.db.Write(&products)
+	err = rp.db.Read(&products)
+	if err != nil {
+		return domain.Products{}, err
+	}
+	fmt.Println("producto cambiado: ", product)
 	return product, nil
 }
