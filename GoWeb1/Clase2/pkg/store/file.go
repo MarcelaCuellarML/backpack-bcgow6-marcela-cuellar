@@ -2,6 +2,7 @@ package store
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 )
 
@@ -42,6 +43,7 @@ func (fs *fileStore) Write(data interface{}) error {
 }
 
 func (fs *fileStore) Read(data interface{}) error {
+	fmt.Println("ruta recibida: ", fs.FilePath)
 	file, err := os.ReadFile(fs.FilePath)
 	if err != nil {
 		return err

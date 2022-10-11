@@ -48,7 +48,7 @@ func validateToken(ctx *gin.Context) string {
 //*****************************************
 
 // Store Product godoc
-// @Summary  Store product
+// @Summary  create new product
 // @Tags     Products
 // @Accept   json
 // @Produce  json
@@ -58,7 +58,7 @@ func validateToken(ctx *gin.Context) string {
 // @Failure  401      {object}  web.Response
 // @Failure  400      {object}  web.Response
 // @Failure  409      {object}  web.Response
-// @Router   /productos [POST]
+// @Router   /products/AddProduct [POST]
 func (prod *Products) CreateProduct() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		validToken := validateToken(ctx)
@@ -93,7 +93,7 @@ func (prod *Products) CreateProduct() gin.HandlerFunc {
 // @Failure  401    {object}  web.Response  "Unauthorized"
 // @Failure  500    {object}  web.Response  "Internal server error "
 // @Failure  404    {object}  web.Response  "Not found products"
-// @Router   /productos [GET]
+// @Router   /products [GET]
 func (prod *Products) GetAll() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		validToken := validateToken(ctx)
@@ -113,7 +113,7 @@ func (prod *Products) GetAll() gin.HandlerFunc {
 }
 
 // ListProducts godoc
-// @Summary  Show list products
+// @Summary  Update one product for products
 // @Tags     Products
 // @Produce  json
 // @Param    id     	path 	  int 	        	true   	"Id product"
@@ -123,7 +123,7 @@ func (prod *Products) GetAll() gin.HandlerFunc {
 // @Failure  401    	{object}  web.Response  			"Unauthorized"
 // @Failure  500    	{object}  web.Response  			"Internal server error "
 // @Failure  404    	{object}  web.Response  			"Not found products"
-// @Router   /productos/{id} [PUT]
+// @Router   /products/UpdateProduct/{id} [PUT]
 
 // Funcion para actualizar un producto
 func (prod *Products) UpdateProduct() gin.HandlerFunc {
@@ -144,7 +144,7 @@ func (prod *Products) UpdateProduct() gin.HandlerFunc {
 				return
 			}
 
-			p, err := prod.service.ActualizarProducto(id, productUpdate.Stock, productUpdate.Name, productUpdate.Color, productUpdate.Code, productUpdate.CreationDate, productUpdate.Price, productUpdate.Published)
+			p, err := prod.service.UpdateProduct(id, productUpdate.Stock, productUpdate.Name, productUpdate.Color, productUpdate.Code, productUpdate.CreationDate, productUpdate.Price, productUpdate.Published)
 			fmt.Println("valor de p: ", p)
 			if err != nil {
 				ctx.JSON(http.StatusNotFound, web.NewResponse(http.StatusNotFound, nil, "no ha sido posible actualizar elemento solicitado, por favor intente mas tarde"))
@@ -158,7 +158,7 @@ func (prod *Products) UpdateProduct() gin.HandlerFunc {
 }
 
 // ListProducts godoc
-// @Summary  Show list products
+// @Summary  Show product by ID for products
 // @Tags     Products
 // @Produce  json
 // @Param    id     	path 	  int 	        	true   	"Id product"
@@ -167,7 +167,7 @@ func (prod *Products) UpdateProduct() gin.HandlerFunc {
 // @Failure  401    	{object}  web.Response  			"Unauthorized"
 // @Failure  500    	{object}  web.Response  			"Internal server error "
 // @Failure  404    	{object}  web.Response  			"Not found products"
-// @Router   /productos/{id} [GET]
+// @Router   /products/{id} [GET]
 
 // Funcion para obtener un producto por su id
 func (prod *Products) GetProductByID() gin.HandlerFunc {
@@ -192,7 +192,7 @@ func (prod *Products) GetProductByID() gin.HandlerFunc {
 }
 
 // ListProducts godoc
-// @Summary  Show list products
+// @Summary  Delete element for products
 // @Tags     Products
 // @Produce  json
 // @Param    id     	path 	  int 	        	true   	"Id product"
@@ -201,7 +201,7 @@ func (prod *Products) GetProductByID() gin.HandlerFunc {
 // @Failure  401    	{object}  web.Response  			"Unauthorized"
 // @Failure  500    	{object}  web.Response  			"Internal server error "
 // @Failure  404    	{object}  web.Response  			"Not found products"
-// @Router   /productos/{id} [DELETE]
+// @Router   /products/{id} [DELETE]
 
 // Funcion para eliminar un producto
 func (prod *Products) DeleteElement() gin.HandlerFunc {
@@ -240,7 +240,7 @@ func (prod *Products) DeleteElement() gin.HandlerFunc {
 // @Failure      401    	{object}  web.Response
 // @Failure      400   		{object}  web.Response
 // @Failure      404   		{object}  web.Response
-// @Router       /productos/{id} [PATCH]
+// @Router       /products/{id} [PATCH]
 // Funcion para actualizar la cantidad de un producto
 func (prod *Products) UpdateQuantity() gin.HandlerFunc {
 	return func(ctx *gin.Context) {
@@ -253,7 +253,7 @@ func (prod *Products) UpdateQuantity() gin.HandlerFunc {
 				ctx.JSON(http.StatusBadRequest, web.NewResponse(http.StatusBadRequest, nil, "el id ingresado no es valido"))
 				return
 			}
-			cant, err := strconv.Atoi(ctx.Param("Stock"))
+			cant, err := strconv.Atoi(ctx.Query("Stock"))
 			if err != nil {
 				ctx.JSON(http.StatusBadRequest, web.NewResponse(http.StatusBadRequest, nil, "la cantidad ingresada no es valida"))
 				return

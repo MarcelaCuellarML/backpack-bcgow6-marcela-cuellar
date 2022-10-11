@@ -24,7 +24,7 @@ type ProductsRepository interface {
 	GetProductByID(id int) (domain.Products, error)
 	AgregarProducto(product domain.Products) (domain.Products, error)
 	GenerateNewID() (int, error)
-	ActualizarProducto(id int, newProduct domain.Products) (domain.Products, error)
+	UpdateProduct(id int, newProduct domain.Products) (domain.Products, error)
 	DeleteElement(id int) ([]domain.Products, error)
 	UpdateQuantity(id, cant int) (domain.Products, error)
 }
@@ -88,24 +88,19 @@ func (rp *repositoryProducts) GenerateNewID() (int, error) {
 }
 
 // Funcion para acualizar un producto
-func (rp *repositoryProducts) ActualizarProducto(id int, newProduct domain.Products) (domain.Products, error) {
+func (rp *repositoryProducts) UpdateProduct(id int, newProduct domain.Products) (domain.Products, error) {
 	err := rp.db.Read(&products)
-	var product domain.Products
 	if err != nil {
 		return domain.Products{}, err
 	}
 	for i := 0; i < len(products); i++ {
 		if products[i].Id == id {
-			product = products[i]
+			products[i] = newProduct
 		}
 	}
-	rp.db.Write(&products)
-	err = rp.db.Read(&products)
-	if err != nil {
-		return domain.Products{}, err
-	}
-	fmt.Println("producto filtrado: ", product)
-	return product, nil
+	rp.db.Write(products)
+	fmt.Println("producto filtrado: ", newProduct)
+	return newProduct, nil
 }
 
 // Funcion para eliminar un elemento
@@ -116,18 +111,19 @@ func (rp *repositoryProducts) DeleteElement(id int) ([]domain.Products, error) {
 	}
 	for i := 0; i < len(products); i++ {
 		if products[i].Id == id {
-			products[i] = domain.Products{}
+			products = append(products[:i], products[i+1:]...)
 		}
 	}
-	rp.db.Write(&products)
-	err = rp.db.Read(&products)
-	if err != nil {
-		return []domain.Products{}, err
-	}
+	rp.db.Write(products)
+	// err = rp.db.Read(&products)
+	// if err != nil {
+	// 	return []domain.Products{}, err
+	// }
 	fmt.Println("producto eliminado")
 	return products, nil
 }
 
+// funcion para actualizar la cantidad en stock de un producto
 func (rp *repositoryProducts) UpdateQuantity(id, cant int) (domain.Products, error) {
 	err := rp.db.Read(&products)
 	var product domain.Products
@@ -136,14 +132,14 @@ func (rp *repositoryProducts) UpdateQuantity(id, cant int) (domain.Products, err
 	}
 	for i := 0; i < len(products); i++ {
 		if products[i].Id == id {
+			//fmt.Println("cantidad del producto solicitado: ", products[i].Stock)
 			products[i].Stock = cant
+			product = products[i]
+			//fmt.Println("producto cambiado: ", product)
 		}
+
 	}
-	rp.db.Write(&products)
-	err = rp.db.Read(&products)
-	if err != nil {
-		return domain.Products{}, err
-	}
-	fmt.Println("producto cambiado: ", product)
+	rp.db.Write(product)
+	fmt.Println("producto cambiado: ", products)
 	return product, nil
 }

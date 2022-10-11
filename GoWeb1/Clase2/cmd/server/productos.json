@@ -1,0 +1,32 @@
+[
+  {
+    "Id": 1,
+    "Name": "Arroz",
+    "Color": "blanco",
+    "Price": 1250,
+    "Stock": 100,
+    "Code": "abc123",
+    "Published": true,
+    "CreationDate": "10/09/2022"
+  },
+  {
+    "Id": 2,
+    "Name": "Azucar",
+    "Color": "blanca",
+    "Price": 30,
+    "Stock": 200,
+    "Code": "abcd123",
+    "Published": true,
+    "CreationDate": "10/10/2022"
+  },
+  {
+    "Id": 3,
+    "Name": "leche",
+    "Color": "blanco",
+    "Price": 1000,
+    "Stock": 20,
+    "Code": "ab123",
+    "Published": true,
+    "CreationDate": "10/09/2022"
+  }
+]

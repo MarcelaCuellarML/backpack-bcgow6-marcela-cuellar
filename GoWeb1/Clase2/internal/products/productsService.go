@@ -20,7 +20,7 @@ type ProductsService interface {
 	GetAll() ([]domain.Products, error)
 	GetProductByID(id int) (domain.Products, error)
 	AgregarProducto(Stock int, Name, Color, Code, CreationDate string, Price float64, Published bool) (domain.Products, error)
-	ActualizarProducto(Id, Stock int, Name, Color, Code, CreationDate string, Price float64, Published bool) (domain.Products, error)
+	UpdateProduct(Id, Stock int, Name, Color, Code, CreationDate string, Price float64, Published bool) (domain.Products, error)
 	DeleteElement(Id int) ([]domain.Products, error)
 	UpdateQuantity(Id, cant int) (domain.Products, error)
 }
@@ -57,10 +57,10 @@ func (s *serviceProducts) AgregarProducto(Stock int, Name, Color, Code, Creation
 }
 
 // Funcion para actuazar un producto
-func (s *serviceProducts) ActualizarProducto(Id, Stock int, Name, Color, Code, CreationDate string, Price float64, Published bool) (domain.Products, error) {
+func (s *serviceProducts) UpdateProduct(Id, Stock int, Name, Color, Code, CreationDate string, Price float64, Published bool) (domain.Products, error) {
 	fmt.Println("llegue al servicio de actualizacion de producto")
 	prod := domain.Products{Id: Id, Name: Name, Color: Color, Price: Price, Stock: Stock, Code: Code, Published: Published, CreationDate: CreationDate}
-	ps, err := s.repo.ActualizarProducto(Id, prod)
+	ps, err := s.repo.UpdateProduct(Id, prod)
 	fmt.Println("Producto que llega al servicio: ", prod.Name)
 	if err != nil {
 		return domain.Products{}, err
