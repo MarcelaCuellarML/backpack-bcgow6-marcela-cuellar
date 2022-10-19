@@ -23,7 +23,7 @@ type Request struct {
 	CreationDate string  `json:"creationDate" binding:"required"`
 }
 type RequestPatch struct {
-	Nombre int `json:"cantidad" binding:"required"`
+	Nombre int `json:"cantidad" binding:"required"` 
 }
 
 type Products struct {

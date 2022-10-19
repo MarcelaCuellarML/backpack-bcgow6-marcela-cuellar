@@ -50,27 +50,3 @@ func (fs *fileStore) Read(data interface{}) error {
 	}
 	return json.Unmarshal(file, &data)
 }
-
-// func leerJson() []byte {
-// 	readFile, err := os.ReadFile("/Users/marcuellar/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/products/productos.json")
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	//listado := fmt.Sprint(string(readFile))
-// 	return readFile
-// }
-
-// func TransformData(listado []byte) (product []products) {
-// 	err := json.Unmarshal(listado, &product)
-// 	if err != nil {
-// 		panic(err)
-// 	}
-// 	//fmt.Println("archivo prueba: ", product)
-// 	return product
-// }
-
-// func GetList() (prod []products) {
-// 	respuesta := leerJson()
-// 	listadoProds := TransformData(respuesta)
-// 	return listadoProds
-// }
