@@ -19,7 +19,6 @@ type Type string
 
 const (
 	FileType Type = "file"
-	//MonoType Type = "mongo"
 )
 
 func New(store Type, fileName string) Store {

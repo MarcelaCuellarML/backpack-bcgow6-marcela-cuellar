@@ -8,7 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 
-	"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/internal/products"
+	"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoTesting/GoWebTest/GoWeb/internal/products"
 	"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoWeb1/Clase2/pkg/web"
 )
 
@@ -23,7 +23,7 @@ type Request struct {
 	CreationDate string  `json:"creationDate" binding:"required"`
 }
 type RequestPatch struct {
-	Nombre int `json:"cantidad" binding:"required"` 
+	Nombre int `json:"cantidad" binding:"required"`
 }
 
 type Products struct {
