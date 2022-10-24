@@ -98,7 +98,10 @@ func (rp *repositoryProducts) UpdateProduct(id int, newProduct domain.Products) 
 			products[i] = newProduct
 		}
 	}
-	rp.db.Write(products)
+	err = rp.db.Write(products)
+	if err != nil {
+		return domain.Products{}, err
+	}
 	fmt.Println("producto filtrado: ", newProduct)
 	return newProduct, nil
 }
@@ -114,11 +117,10 @@ func (rp *repositoryProducts) DeleteElement(id int) ([]domain.Products, error) {
 			products = append(products[:i], products[i+1:]...)
 		}
 	}
-	rp.db.Write(products)
-	// err = rp.db.Read(&products)
-	// if err != nil {
-	// 	return []domain.Products{}, err
-	// }
+	err = rp.db.Write(products)
+	if err != nil {
+		return []domain.Products{}, err
+	}
 	fmt.Println("producto eliminado")
 	return products, nil
 }
@@ -139,7 +141,10 @@ func (rp *repositoryProducts) UpdateQuantity(id, cant int) (domain.Products, err
 		}
 
 	}
-	rp.db.Write(product)
+	err = rp.db.Write(product)
+	if err != nil {
+		return domain.Products{}, err
+	}
 	fmt.Println("producto cambiado: ", products)
 	return product, nil
 }

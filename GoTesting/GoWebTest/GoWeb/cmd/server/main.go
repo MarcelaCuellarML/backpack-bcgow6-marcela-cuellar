@@ -52,5 +52,8 @@ func main() {
 	pr.DELETE("/:id", handler.DeleteElement())
 	pr.PATCH("/:id", handler.UpdateQuantity())
 
-	router.Run()
+	err = router.Run()
+	if err != nil {
+		return
+	}
 }

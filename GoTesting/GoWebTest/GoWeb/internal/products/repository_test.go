@@ -18,7 +18,7 @@ func (s *StubReadProducts) Read(data interface{}) error {
 	s.readWasCalled = true
 	a, ok := data.(*[]domain.Products)
 	if !ok {
-		return errors.New("it failed!")
+		return errors.New("no ha sido posible hacer una lectura")
 	}
 	*a = s.mockData
 	return nil
@@ -62,6 +62,7 @@ func TestGetAllProds(t *testing.T) {
 }
 
 func TestUpdateName(t *testing.T) {
+	//arrange
 	data := []domain.Products{
 		{
 			Id:           1,
@@ -75,7 +76,7 @@ func TestUpdateName(t *testing.T) {
 		},
 	}
 	productExpected := data[0]
-	updateName := domain.Products{
+	updateNameData := domain.Products{
 		Name:         "Televisor",
 		Color:        "black",
 		Price:        2500,
@@ -84,13 +85,104 @@ func TestUpdateName(t *testing.T) {
 		Published:    true,
 		CreationDate: "10-2022",
 	}
-	productExpected.Name = updateName.Name
+	//act
+	productExpected.Name = updateNameData.Name
 	db := &StubReadProducts{mockData: data, readWasCalled: false}
 	r := NewRepository(db)
-
-	response, err := r.UpdateProduct(1, updateName)
-
+	response, err := r.UpdateProduct(1, updateNameData)
+	// assert
 	assert.Nil(t, err)
 	assert.Equal(t, productExpected.Name, response.Name)
+	assert.True(t, db.readWasCalled)
+}
+
+func TestDelete(t *testing.T) {
+	//arrange
+	data := []domain.Products{
+		{
+			Name:         "tele",
+			Id:           1,
+			Color:        "negro",
+			Price:        1000,
+			Stock:        20,
+			Code:         "tele123",
+			Published:    true,
+			CreationDate: "10-2022",
+		},
+		{
+			Name:         "nevera",
+			Id:           1,
+			Color:        "blanco",
+			Price:        3000,
+			Stock:        50,
+			Code:         "nevera123",
+			Published:    true,
+			CreationDate: "10-2022",
+		},
+	}
+	expectedData := []domain.Products{
+		{
+			Name:         "nevera",
+			Id:           1,
+			Color:        "blanco",
+			Price:        3000,
+			Stock:        50,
+			Code:         "nevera123",
+			Published:    true,
+			CreationDate: "10-2022",
+		},
+	}
+	idToDelete := 1
+	//act
+	db := &StubReadProducts{mockData: data, readWasCalled: false}
+	r := NewRepository(db)
+	response, err := r.DeleteElement(idToDelete)
+	// assert
+	assert.Nil(t, err)
+	assert.Equal(t, expectedData, response)
+	assert.True(t, db.readWasCalled)
+}
+
+func TestCreate(t *testing.T) {
+	//arrange
+	data := []domain.Products{
+		{
+			Name:         "tele",
+			Id:           1,
+			Color:        "negro",
+			Price:        1000,
+			Stock:        20,
+			Code:         "tele123",
+			Published:    true,
+			CreationDate: "10-2022",
+		},
+	}
+	expectedData := domain.Products{
+		Name:         "nevera",
+		Id:           2,
+		Color:        "blanco",
+		Price:        3000,
+		Stock:        50,
+		Code:         "nevera123",
+		Published:    true,
+		CreationDate: "10-2022",
+	}
+	createNewData := domain.Products{
+		Name:         "nevera",
+		Id:           2,
+		Color:        "blanco",
+		Price:        3000,
+		Stock:        50,
+		Code:         "nevera123",
+		Published:    true,
+		CreationDate: "10-2022",
+	}
+	//act
+	db := &StubReadProducts{mockData: data, readWasCalled: false}
+	r := NewRepository(db)
+	response, err := r.AgregarProducto(createNewData)
+	// assert
+	assert.Nil(t, err)
+	assert.Equal(t, expectedData, response)
 	assert.True(t, db.readWasCalled)
 }
