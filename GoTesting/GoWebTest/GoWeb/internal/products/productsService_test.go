@@ -4,8 +4,9 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoTesting/GoWebTest/GoWeb/internal/domain"
 	"github.com/stretchr/testify/assert"
+
+	"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoTesting/GoWebTest/GoWeb/internal/domain"
 )
 
 type MockStorage struct {

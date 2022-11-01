@@ -1,8 +1,9 @@
 package router
 
 import (
-	"github.com/bootcamp-go/desafio-cierre-testing/internal/products"
 	"github.com/gin-gonic/gin"
+
+	"github.com/MarcelaCuellarML/backpack-bcgow6-marcela-cuellar/GoTesting/Desafio-GoTesting/internal/products"
 )
 
 func MapRoutes(r *gin.Engine) {
