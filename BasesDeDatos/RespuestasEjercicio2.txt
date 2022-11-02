@@ -1,0 +1,10 @@
+a. ¿Cuál es la primary key para la tabla de clientes? Justificar respuesta
+R// Es el DNI, ya que es el unico dato que es unico, no se va a repetir, lo que nos asegura que solo va a estar asignado a una persona
+
+b. ¿Cuál es la primary key para la tabla de planes de internet? Justificar respuesta.
+R// Es el id del plan en cuention, ya que cada plan es distinto, pero puede tener cosas en comun con los otros, por lo tanto su id es el unico dato que no se va a repetir 
+para ningun otro plan.
+
+c. ¿Cómo serían las relaciones entre tablas? ¿En qué tabla debería haber foreign key? ¿A qué campo de qué tabla hace referencia dicha foreign key? Justificar respuesta.
+R// Segun mi diseño, genere una relacion de muchos a muchos, porque considero que una persona puede tener varios planes, pero tambien un mismo plan lo pueden usar muchas 
+personas. Por lo tanto usé una tabla intermedia para hacer el cruce de informacion entre clientes y planes por medio de su DNI(cielte) y del IdPlan(planes)

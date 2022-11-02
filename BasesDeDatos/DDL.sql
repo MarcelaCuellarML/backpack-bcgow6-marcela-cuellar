@@ -1,0 +1,28 @@
+CREATE DATABASE empresa_internet;
+
+CREATE TABLE customer 
+(
+dni INT PRIMARY KEY NOT NULL, 
+firstName VARCHAR(30) NOT NULL,
+lastName VARCHAR(30) NOT NULL,
+bornDate DATE NOT NULL,
+province VARCHAR(30) NOT NULL,
+city VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE plan 
+(
+idPlan INT PRIMARY KEY NOT NULL, 
+speedMG INT NOT NULL,
+price FLOAT NOT NULL,
+discount FLOAT NOT NULL
+);
+
+CREATE TABLE contract
+(
+idContract INT PRIMARY KEY NOT NULL AUTO_INCREMENT, 
+idPlan INT NOT NULL,
+dni INT NOT NULL,
+FOREIGN KEY (idPlan) REFERENCES plan(idPlan),
+FOREIGN KEY (dni) REFERENCES customer(dni)
+);
